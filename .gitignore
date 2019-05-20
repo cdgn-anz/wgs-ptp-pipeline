@@ -1,0 +1,11 @@
+.snakemake
+*.toml
+.vagrant
+*.simg
+*.log
+ERR*
+__pycache__
+.DS_Store
+a
+b
+*tgz
