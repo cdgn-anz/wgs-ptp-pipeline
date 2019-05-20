@@ -1,0 +1,45 @@
+Bootstrap: docker
+From: continuumio/miniconda3:4.5.12
+
+%help
+A Singularity image for mlst
+
+%labels
+Maintainer Anders Goncalves da Silva
+Build 1.0
+mlst
+
+%environment
+export VERSION=1.0
+export PATH=/opt/conda/bin:$PATH
+
+%post
+ # set versions of software to install
+  export MLST_VERSION=2.16.1
+  export MLST_BUILD=0
+
+  export PATH=/opt/conda/bin:$PATH
+
+  conda config --add channels conda-forge
+  conda config --add channels defaults
+  conda config --add channels r
+  conda config --add channels bioconda
+
+  conda install -c bioconda mlst=${MLST_VERSION}=${MLST_BUILD}
+
+  cd /opt/conda/pkgs/mlst-${MLST_VERSION}-${MLST_BUILD}/scripts
+  ./mlst-download_pub_mlst | bash
+  rm ../db/pubmlst && mv ./pubmlst ../db/
+  ./mlst-make_blast_db
+  rm -rf /opt/conda/db && cp -r ../db /opt/conda/
+
+  pip install toml
+ 
+  echo "Sorting some env variables..."
+  echo "All DBs updated on $(date "+%Y-%m-%d")" > /etc/dbupdate
+  chmod 555 /etc/dbupdate
+  
+  echo "Done"
+
+%runscript
+  cat /etc/dbupdate >&2
