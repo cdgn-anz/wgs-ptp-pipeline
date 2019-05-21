@@ -1,0 +1,128 @@
+'''
+A snakemake file to run the RCPA WGS PTP data qc pipeline
+'''
+
+import pathlib
+
+
+def new_toml(output):
+    p = pathlib.Path(output)
+    p.touch()
+
+
+def toml_files(wildcards):
+    return [f"{wildcards.sample}/{f}.toml" for f in ['read_assessment', 'trimmed_reads', 'species', 'assembled_reads', 'mlst',  # 'serotyping',
+                                                     'amr']]
+
+
+sample = ["ERR1305793"]
+
+rule all:
+    input: expand("{sample}/final.toml", sample=sample)
+
+rule read_assessment:
+    input: ["{sample}/R1.fq.gz", "{sample}/R2.fq.gz"]
+    output: temp("{sample}/read_assessment.toml")
+    benchmark: "{sample}/read_assessment_benchmark.txt"
+    singularity: "../singularity/read_assessment.simg"
+    params:
+        file_type = 'raw'
+    script:
+        "../scripts/read_assessment.py"
+
+rule trim_reads:
+    input: "{sample}/read_assessment.toml"
+    output: temp("{sample}/trimmed_reads.toml")
+    benchmark: "{sample}/trimmed_reads_benchmark.txt"
+    singularity: "../singularity/read_assessment.simg"
+    params:
+        min_qual = 10,
+        file_type = 'raw'
+    threads: 1
+    script:
+        "../scripts/trim_reads.py"
+
+rule trimmed_read_assessment:
+    input: "{sample}/trimmed_reads.toml"
+    output: temp("{sample}/trimmed_reads_assessment.toml")
+    benchmark: "{sample}/trimmed_read_assessment_benchmark.txt"
+    singularity: "../singularity/read_assessment.simg"
+    params:
+        file_type = "trimmed"
+    script:
+        "scripts/read_assessment.py"
+
+rule run_kraken:
+    input: "{sample}/trimmed_reads_assessment.toml"
+    output: temp("{sample}/species.toml")
+    benchmark: "{sample}/species_benchmark.txt"
+    singularity: "../singularity/kraken2.simg"
+    params:
+        file_type = "trimmed",
+        kraken_opts = ""
+    threads: 2
+    script:
+        "../scripts/run_kraken2.py"
+
+rule estimate_genome_size:
+    input: "{sample}/species.toml"
+    output: temp("{sample}/genome_size.toml")
+    benchmark: "{sample}/genome_size_benchmark.txt"
+    singularity: "singularity/kmer_counters.simg"
+    params:
+        file_type = "trimmed",
+        min_kmer_count = 3,
+        kmer_len = 31,
+        mash_opts = ""
+    script:
+        "../scripts/estimate_genome_size.py"
+
+rule assemble_reads:
+    input: "{sample}/genome_size.toml"
+    output: temp("{sample}/assembled_reads.toml")
+    benchmark: "{sample}/assembly_benchmark.txt"
+    singularity: "singularity/asm.simg"
+    params:
+        assembler = "shovill",
+        file_type = "trimmed",
+        memory = "8",
+        asm_opts = ""
+    threads: 2
+    script:
+        "../scripts/assemble_reads.py"
+
+rule run_mlst:
+    input: "{sample}/assembled_reads.toml"
+    output: temp("{sample}/mlst.toml")
+    benchmark: "{sample}/mlst_benchmark.txt"
+    singularity: "singularity/mlst.simg"
+    params:
+        assembler = "shovill",
+        mlst_opts = ""
+    script:
+        "../scripts/run_mlst.py"
+
+# rule run_serotyping:
+#     input: "{sample}/assembled_reads.toml"
+#     output: temp("{sample}/serotyping.toml")
+#     run:
+#         new_toml(output[0])
+
+rule run_amr:
+    input: "{sample}/mlst.toml"
+    output: temp("{sample}/amr.toml")
+    benchmark: "{sample}/abricate_benchmark.txt"
+    singularity: "../singularity/abricate.simg"
+    params:
+        assembler = 'shovill',
+        db = 'resfinder',
+        abricate_opts = ""
+    script:
+        "../scripts/run_abricate.py"
+
+rule gather_toml:
+    input: toml_files
+    output: "{sample}/final.toml"
+    run:
+        for s in sample:
+            shell(f"cp {s}/amr.toml {s}/final.toml")
