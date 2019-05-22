@@ -3,6 +3,9 @@ A snakemake file to run the RCPA WGS PTP ntc qc pipeline
 '''
 
 import pathlib
+import pandas as pd
+
+RULE_TOML = ['read_assessment', 'species']
 
 
 def new_toml(output):
@@ -10,40 +13,47 @@ def new_toml(output):
     p.touch()
 
 
-def toml_files(wildcards):
-    return [f"{wildcards.sample}/{f}.toml" for f in ['read_assessment', 'species']]
+def load_tab(filename, sample_type):
+    tab = pd.read_csv(filename, engine="python", sep=None)
+    tab = tab.query(f"SAMPLE_TYPE == '{sample_type}'")
+    tab = tab.set_index("SAMPLE_ID", drop=False)
+    return tab
 
 
-sample = ["ERR1305793"]
+def get_fastq(wildcards):
+    sample_id = wildcards.sample
+    return sample.loc[sample_id][["R1", "R2"]].to_list()
+
+
+sample = load_tab(config['input'], 'ntc')
 
 rule all:
-    input: expand("{sample}/final.toml", sample=sample)
+    input: "ntc.toml"
 
 rule read_assessment:
-    input: ["{sample}/R1.fq.gz", "{sample}/R2.fq.gz"]
+    input: get_fastq
     output: temp("{sample}/read_assessment.toml")
     benchmark: "{sample}/read_assessment_benchmark.txt"
-    singularity: "../singularity/read_assessment.simg"
+    singularity: "../singularity_images/read_assessment.simg"
     params:
         file_type = 'raw'
     script:
         "../scripts/read_assessment.py"
 
 rule run_kraken:
-    input: "{sample}/trimmed_reads_assessment.toml"
+    input: "{sample}/read_assessment.toml"
     output: temp("{sample}/species.toml")
     benchmark: "{sample}/species_benchmark.txt"
-    singularity: "../singularity/kraken2.simg"
+    singularity: "../singularity_images/kraken2.simg"
     params:
-        file_type = "trimmed",
+        file_type = "raw",
         kraken_opts = ""
     threads: 2
     script:
         "../scripts/run_kraken2.py"
 
 rule gather_toml:
-    input: toml_files
-    output: "{sample}/final.toml"
+    input: expand("{sample}/species.toml", sample=sample.index)
+    output: "ntc.toml"
     run:
-        for s in sample:
-            shell(f"cp {s}/amr.toml {s}/final.toml")
+        shell(f"cat {' '.join(input)} >> {output[0]}")
