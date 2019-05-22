@@ -1,0 +1,37 @@
+input: "../input.tab"
+
+# read assessment options
+ra_file_type: "trimmed"
+
+# trimming options
+trim_threads: 2
+trim_file_type: "raw"
+trim_min_qual: 10
+
+
+# trimmed reads assessment
+tra_file_type: "trimmed"
+
+# kraken options
+kraken_threads: 2
+kraken_file_type: "trimmed"
+kraken_opts: " "
+
+# estimate genome size options
+egs_file_type: "trimmed"
+egs_min_kmer_count: 3
+egs_kmer_len: 31
+egs_mash_opts: " "
+
+# assembly options
+asm_file_type: "trimmed"
+asm_memory: 6
+asm_threads: 2
+asm_shovill_opts: "--minlen 500"
+
+# assembly assessment options
+aa_threads: 2
+aa_assembler: "shovill"
+aa_file_type: "trimmed"
+aa_quast_opts: "--contig-thresholds 0,500,1000,10000,50000,250000 --no-plots --no-html --no-icarus"
+
