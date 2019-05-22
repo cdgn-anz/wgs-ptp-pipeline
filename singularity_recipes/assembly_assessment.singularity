@@ -1,0 +1,41 @@
+Bootstrap: docker
+From: continuumio/miniconda3:4.5.12
+
+%help
+A Singularity image for assembly assessment
+
+%labels
+Maintainer Anders Goncalves da Silva
+Build 1.0
+assembly assessment
+
+%environment
+export VERSION=1.0
+export PATH=/opt/conda/bin:$PATH
+
+%post
+ # set versions of software to install
+  export VERSION=1.0
+  export QUAST_VERSION=5.0.2
+  export QUAST_BUILD=py36pl526ha92aebf_0
+
+  export PATH=/opt/conda/bin:$PATH
+
+  conda config --add channels conda-forge
+  conda config --add channels defaults
+  conda config --add channels r
+  conda config --add channels bioconda
+
+  conda install quast=${QUAST_VERSION}=${QUAST_BUILD}
+
+  pip install toml
+  pip install pandas
+ 
+  echo "Sorting some env variables..."
+  echo "All DBs updated on $(date "+%Y-%m-%d")" > /etc/dbupdate
+  chmod 555 /etc/dbupdate
+  
+  echo "Done"
+
+
+
