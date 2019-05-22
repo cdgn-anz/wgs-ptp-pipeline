@@ -13,7 +13,6 @@ outputs = snakemake.output
 sample = snakemake.wildcards.sample
 file_type = snakemake.params.file_type
 
-
 def run_seqtk_fqchk(filename):
     p = subprocess.run(["seqtk", "fqchk", f"{filename}"],
                        capture_output=True, encoding="utf8")
