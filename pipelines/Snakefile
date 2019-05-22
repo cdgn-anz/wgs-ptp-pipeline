@@ -5,17 +5,19 @@ A master Snakefile to run both data and NTC pipelines
 subworkflow ntc:
     workdir: "ntc_pipeline"
     snakefile: "ntc_pipeline/Snakefile"
+    configfile: "config.yaml"
 
 subworkflow data:
     workdir: "data_pipeline"
     snakefile: "data_pipeline/Snakefile"
+    configfile: "config.yaml"
 
 rule all:
     input: "qc_results.toml"
 
 rule gather_toml:
     input:
-        ntc("ntc.toml")
+        ntc("ntc.toml"),
         data("data.toml")
     output: "qc_results.toml"
     run:
