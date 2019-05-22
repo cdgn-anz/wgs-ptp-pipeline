@@ -39,8 +39,8 @@ case $(id -u) in
          # need to put things in $HOME, because can't mount singularity images
          # in /vagrant --- this is a known issue with no fix.
          mkdir -p $HOME/qc_folder/singularity 
-         cp /vagrant/singularity/startup.sh $HOME/qc_folder/startup.sh
-         cp /vagrant/Snakefile $HOME/qc_folder/Snakefile
+         cp /vagrant/startup.sh $HOME/qc_folder/startup.sh
+         cp -r /vagrant/pipelines $HOME/qc_folder/
          cd $HOME/qc_folder && bash startup.sh
          echo "All done... Run: snakemake --use-singularity..."
          ;;
