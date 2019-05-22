@@ -44,9 +44,14 @@ def get_top_three_genera(tab):
 
 def get_top_species(tab, top_genera):
     for genus in top_genera:
+        genus['species'] = {}
         query = f"taxon_level == 'S' and taxon.str.contains('{genus['taxon']}')"
-        genus['species'] = top_species = tab.query(query).sort_values(
-            by='percentage', ascending=False).iloc[0][['percentage', 'taxon']].to_dict()
+        top_species = tab.query(query).sort_values(
+            by='percentage', ascending=False)
+        if len(top_species) > 0:
+            genus['species']["top_species"] = top_species.iloc[0][['percentage', 'taxon']].to_dict()
+        else:
+            genus['species']["top_species"] = "None"
     return top_genera
 
 
@@ -59,7 +64,8 @@ def parse_kraken2_report(sample):
     top_genera = get_top_species(tab, top_genera)
     kraken = {}
     kraken['kraken'] = {'unclassified': unclassified,
-                        'classified': top_genera}
+                        'classified': top_genera,
+                        'full_report': tab.to_dict(orient="records")}
     return kraken
 
 
