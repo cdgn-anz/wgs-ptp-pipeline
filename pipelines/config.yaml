@@ -1,7 +1,7 @@
 input: "../input.tab"
 
 # read assessment options
-ra_file_type: "trimmed"
+ra_file_type: "raw"
 
 # trimming options
 trim_threads: 2
@@ -34,4 +34,10 @@ aa_threads: 2
 aa_assembler: "shovill"
 aa_file_type: "trimmed"
 aa_quast_opts: "--contig-thresholds 0,500,1000,10000,50000,250000 --no-plots --no-html --no-icarus"
+
+# serotyping options
+sero_threads: 2
+sero_assembler: "shovill"
+sero_sistr_opts: " "
+
 
