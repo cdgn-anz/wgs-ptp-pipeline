@@ -1,3 +1,9 @@
+# input file in TAB/CSV separated format
+# first line is a header line with the following column names (in all caps):
+# SAMPLE_ID, R1, R2, SAMPLE_TYPE
+# subsequent lines contain individual data samples, with full path to R1 and R2 reads.
+# SAMPLE_ID should not contain ANY SPECIAL CHARACTERS (e.g., |)
+# SAMPLE_TYPE can be either data or ntc
 input: "../input.tab"
 
 # read assessment options
@@ -39,5 +45,11 @@ aa_quast_opts: "--contig-thresholds 0,500,1000,10000,50000,250000 --no-plots --n
 sero_threads: 2
 sero_assembler: "shovill"
 sero_sistr_opts: " "
+
+# abricate options
+abr_assembler: "shovill"
+abr_db: "ncbi"
+abr_opts: "--minid 75 --mincov 0"
+
 
 
