@@ -14,7 +14,6 @@ trim_threads: 2
 trim_file_type: "raw"
 trim_min_qual: 10
 
-
 # trimmed reads assessment
 tra_file_type: "trimmed"
 
@@ -50,6 +49,3 @@ sero_sistr_opts: " "
 abr_assembler: "shovill"
 abr_db: "ncbi"
 abr_opts: "--minid 75 --mincov 0"
-
-
-
