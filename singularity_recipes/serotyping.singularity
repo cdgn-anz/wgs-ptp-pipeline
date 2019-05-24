@@ -29,6 +29,7 @@ export PATH=/opt/conda/bin:$PATH
 
   pip install toml
   pip install pandas
+  pip install mock
 
   echo "Sorting some env variables..."
   echo "All DBs updated on $(date "+%Y-%m-%d")" > /etc/dbupdate
