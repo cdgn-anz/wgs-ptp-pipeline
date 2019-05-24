@@ -21,4 +21,4 @@ rule gather_toml:
         data("data.toml")
     output: "qc_results.toml"
     run:
-        shell("touch qc_results.toml")
+        shell(f"cat {' '.join(input)} > {output[0]}")
