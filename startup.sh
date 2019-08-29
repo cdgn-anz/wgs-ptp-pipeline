@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# some options to 
+# some options to wget
 WGET_OPTS="-nv --show-progress --progress=dot:giga"
 
 echo "###"
