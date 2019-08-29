@@ -50,7 +50,7 @@ Running the pipeline
 Clone the repository:
 
 ``` console
-git clone https://github.com/cdgn-anz/rcpa_wgs_ptp.git
+git clone https://github.com/cdgn-anz/wgs-ptp-pipeline
 ```
 
 ### Running on Mac
