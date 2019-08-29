@@ -10,3 +10,5 @@ a
 b
 *tgz
 *.zip
+generate_readme.sh
+localREADME.md
