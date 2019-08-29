@@ -35,6 +35,7 @@ case $(id -u) in
          pip install git+https://github.com/pytries/datrie.git
          pip install snakemake
          pip install psutil
+         pip install pandas
          echo "starting up..."
          # need to put things in $HOME, because can't mount singularity images
          # in /vagrant --- this is a known issue with no fix.
