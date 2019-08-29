@@ -4,6 +4,8 @@
 # subsequent lines contain individual data samples, with full path to R1 and R2 reads.
 # SAMPLE_ID should not contain ANY SPECIAL CHARACTERS (e.g., |)
 # SAMPLE_TYPE can be either data or ntc
+
+# change this line to point to your data file
 input: "../input.tab"
 
 # read assessment options
